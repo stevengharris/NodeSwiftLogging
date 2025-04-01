@@ -1,7 +1,7 @@
 {
-  "name": "node-swift-utils",
+  "name": "node-swift-logger",
   "version": "1.0.0",
-  "description": "Swift-side utilities for node-swift",
+  "description": "Log to the node.js console from Swift",
   "main": "index.js",
   "scripts": {
     "install": "node-swift rebuild",

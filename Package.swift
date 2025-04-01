@@ -3,36 +3,31 @@
 import PackageDescription
 
 let package = Package(
-    name: "NSUtils",
+    name: "NSLogging",
     platforms: [.macOS(.v14)],
     products: [
         .library(
-            name: "NSUtils",
-            targets: ["NSUtils"]
+            name: "NSLogging",
+            targets: ["NSLogging"]
         ),
         .library(
             name: "Module",
             type: .dynamic,
-            targets: ["NSUtils"]
+            targets: ["NSLogging"]
         )
     ],
     dependencies: [
-        .package(path: "node_modules/node-swift"),
+        .package(url: "https://github.com/kabiroberai/node-swift.git", from: "1.3.0"),
+        .package(url: "https://github.com/apple/swift-log", from: "1.0.0"),
     ],
     targets: [
         .target(
-            name: "NSUtils",
+            name: "NSLogging",
             dependencies: [
                 .product(name: "NodeAPI", package: "node-swift"),
                 .product(name: "NodeModuleSupport", package: "node-swift"),
+                .product(name: "Logging", package: "swift-log")
             ]
-        ),
-        .testTarget(
-            name: "NSUtilsTests",
-            dependencies: [
-                .product(name: "NodeAPI", package: "node-swift"),
-                .product(name: "NodeModuleSupport", package: "node-swift"),
-            ]
-        ),
+        )
     ]
 )
