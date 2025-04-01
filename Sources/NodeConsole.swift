@@ -10,7 +10,7 @@ import NodeAPI
 import Logging
 
 /// A facade for the NodeConsole class used in node.js.
-@NodeClass final class NodeConsoleFacade {
+@NodeClass public final class NodeConsoleFacade {
     
     /// The queue to run the callback on (see https://github.com/kabiroberai/node-swift/issues/17)
     private let nodeQueue: NodeAsyncQueue
