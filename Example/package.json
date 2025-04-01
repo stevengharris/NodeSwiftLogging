@@ -1,0 +1,17 @@
+{
+  "name": "nslogging-example",
+  "version": "1.0.0",
+  "description": "Example of using NSLogging",
+  "main": "index.js",
+  "scripts": {
+    "install": "node-swift rebuild",
+    "build": "node-swift build",
+    "builddebug": "node-swift build --debug",
+    "clean": "node-swift clean"
+  },
+  "author": "Steven G. Harris",
+  "license": "CC0-1.0",
+  "dependencies": {
+    "node-swift": "https://github.com/kabiroberai/node-swift.git"
+  }
+}
