@@ -7,7 +7,7 @@
 //
 
 import NodeAPI
-import Logging
+import NSLogging
 
 #NodeModule(exports: [
     "NodeConsole": NodeConsoleFacade.deferredConstructor,

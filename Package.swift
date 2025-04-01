@@ -18,7 +18,6 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/kabiroberai/node-swift.git", from: "1.3.0"),
-        .package(url: "https://github.com/apple/swift-log", from: "1.0.0"),
     ],
     targets: [
         .target(
@@ -26,7 +25,6 @@ let package = Package(
             dependencies: [
                 .product(name: "NodeAPI", package: "node-swift"),
                 .product(name: "NodeModuleSupport", package: "node-swift"),
-                .product(name: "Logging", package: "swift-log")
             ]
         )
     ]
