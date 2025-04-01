@@ -27,7 +27,7 @@ When (from your node app) you register the callback to be used by `NodeConsole`,
 
 You need to have node.js and npm installed.
 
-You should already be using [node-swift](https://github.com/kabiroberai/node-swift) in a Swift package. That means you will have a project that includes both `Package.swift` and `package.json`. Add NSLogger as a dependency. The resulting `Package.swift` will look something like this:
+You should already be using [node-swift](https://github.com/kabiroberai/node-swift) in a Swift package. That means you will have a project that includes both `Package.swift` and `package.json`. Add NSLogging as a dependency. The resulting `Package.swift` will look something like this:
 
 ```
 // swift-tools-version:5.9
@@ -50,7 +50,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/kabiroberai/node-swift.git", from: "1.3.0"),
-        .package(url: "https://github.com/stevengharris/NSLogger.git", from: "1.0.0"),
+        .package(url: "https://github.com/stevengharris/NSLogging.git", from: "1.0.0"),
     ],
     targets: [
         .target(
@@ -58,7 +58,7 @@ let package = Package(
             dependencies: [
                 .product(name: "NodeAPI", package: "node-swift"),
                 .product(name: "NodeModuleSupport", package: "node-swift"),
-                "NSLogger"
+                "NSLogging",
             ]
         )
     ]
@@ -69,7 +69,7 @@ Your `package.json` will look something like this:
 
 ```
 {
-  "name": "NSLogger example",
+  "name": "NSLogging example",
   "version": "1.0.0",
   "description": "Log to the node.js console from Swift",
   "main": "index.js",
