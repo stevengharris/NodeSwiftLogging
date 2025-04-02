@@ -1,5 +1,7 @@
 .DS_Store
 .build/
-.swiftpm/xcode/
+**/.swiftpm/xcode/
 */xcuserdata/*
 **/node_modules/
+**/package-lock.json
+**/Package.resolved

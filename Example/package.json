@@ -12,6 +12,7 @@
   "author": "Steven G. Harris",
   "license": "CC0-1.0",
   "dependencies": {
-    "node-swift": "https://github.com/kabiroberai/node-swift.git"
+    "node-swift": "https://github.com/kabiroberai/node-swift.git",
+    "nslogging": "https://github.com/stevengharris/NSLogging.git"
   }
 }

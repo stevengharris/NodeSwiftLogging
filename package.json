@@ -9,6 +9,10 @@
     "builddebug": "node-swift build --debug",
     "clean": "node-swift clean"
   },
+  "files": [
+    "Sources",
+    "Package.swift"
+  ],
   "author": "Steven G. Harris",
   "license": "MIT",
   "dependencies": {
