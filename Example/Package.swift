@@ -19,7 +19,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/kabiroberai/node-swift.git", from: "1.3.0"),
         .package(url: "https://github.com/apple/swift-log.git", from: "1.0.0"),
-        .package(url: "https://github.com/stevengharris/NSLogging.git", from: "1.0.0"),
+        .package(url: "https://github.com/stevengharris/NSLogging.git", branch: "main"),
     ],
     targets: [
         .target(

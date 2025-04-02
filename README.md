@@ -27,7 +27,11 @@ When (from your node app) you register the callback to be used by `NodeConsole`,
 
 You need to have node.js and npm installed.
 
-You should already be using [node-swift](https://github.com/kabiroberai/node-swift) in a Swift package. That means you will have a project that includes both `Package.swift` and `package.json`. Add NSLogging as a dependency. The resulting `Package.swift` will look something like this:
+You should already be using [node-swift](https://github.com/kabiroberai/node-swift) in a Swift package. That means you will have a project that includes both `Package.swift` and `package.json`. Add NSLogging as a dependency. 
+
+## Example
+
+The resulting `Package.swift` will look something like the one in the Example directory:
 
 ```
 // swift-tools-version:5.9
@@ -35,43 +39,45 @@ You should already be using [node-swift](https://github.com/kabiroberai/node-swi
 import PackageDescription
 
 let package = Package(
-    name: "NSLoggerExample",
+    name: "NSLoggingExample",
     platforms: [.macOS(.v14)],
     products: [
         .library(
-            name: "NSLoggerExample",
-            targets: ["NSLoggerExample"]
+            name: "NSLoggingExample",
+            targets: ["NSLoggingExample"]
         ),
         .library(
             name: "Module",
             type: .dynamic,
-            targets: ["NSLoggerExample"]
+            targets: ["NSLoggingExample"]
         )
     ],
     dependencies: [
         .package(url: "https://github.com/kabiroberai/node-swift.git", from: "1.3.0"),
-        .package(url: "https://github.com/stevengharris/NSLogging.git", from: "1.0.0"),
+        .package(url: "https://github.com/apple/swift-log.git", from: "1.0.0"),
+        .package(url: "https://github.com/stevengharris/NSLogging.git", branch: "main"),
     ],
     targets: [
         .target(
-            name: "NSLoggerExample",
+            name: "NSLoggingExample",
             dependencies: [
                 .product(name: "NodeAPI", package: "node-swift"),
                 .product(name: "NodeModuleSupport", package: "node-swift"),
-                "NSLogging",
+                .product(name: "Logging", package: "swift-log"),
+                "NSLogging"
             ]
         )
     ]
 )
 ```
 
-Your `package.json` will look something like this:
+Your `package.json` will look something like the one in the Example directory:
 
 ```
 {
-  "name": "NSLogging example",
+  "name": "nslogging-example",
   "version": "1.0.0",
-  "description": "Log to the node.js console from Swift",
+  "description": "Example of using NSLogging",
   "main": "index.js",
   "scripts": {
     "install": "node-swift rebuild",
@@ -80,7 +86,7 @@ Your `package.json` will look something like this:
     "clean": "node-swift clean"
   },
   "author": "Steven G. Harris",
-  "license": "MIT",
+  "license": "CC0-1.0",
   "dependencies": {
     "node-swift": "https://github.com/kabiroberai/node-swift.git"
   }
@@ -121,6 +127,8 @@ $
 ```
 
 ## Using NSLogging
+
+There is an example in the Example directory of the NSLogging repo, which is not part of the package.
 
 ### Swift
 
