@@ -20,6 +20,7 @@ let package = Package(
             name: "NodeSwiftLogging",
             dependencies: [
                 .product(name: "NodeAPI", package: "node-swift"),
+                .product(name: "Logging", package: "swift-log"),
             ]
         )
     ]
