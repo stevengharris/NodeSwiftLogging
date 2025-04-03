@@ -47,7 +47,24 @@ will be quick to produce a new `Module.node` that can be used on the JavaScript 
 
 ### Testing NodeSwiftLogging
 
-After `npm install` (or subsequently, `npm run build`) is complete, run node on the supplied `index.js`:
+The `index.js` file shows how to access the `Module.node` you just built and the two Swift endpoints that were exported in `NodeModuleExports.swift`.
+
+```
+const { NodeConsole, testLogger, testNodeConsole } = require('./.build/Module.node');
+
+// Register the callback from Swift, including swift-log Logger info and higher messages
+const nodeConsole = new NodeConsole();
+nodeConsole.registerLogCallback((message) => {
+    console.log("Swift> " + message);
+}, "info");
+
+console.log("Registered the NodeConsole.logCallback");
+
+testLogger();       // Swift> info: Invoked Logger(label: "NSLogger").info from Swift!
+testNodeConsole();  // Swift> Invoked NodeConsole.log from Swift!
+```
+
+Run node on the supplied `index.js`:
 
 ```
 node index.js
