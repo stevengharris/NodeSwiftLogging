@@ -10,7 +10,6 @@
   "author": "Steven G. Harris",
   "license": "CC0-1.0",
   "dependencies": {
-    "nslogging": "https://github.com/stevengharris/NodeSwiftLogging.git",
     "node-swift": "https://github.com/kabiroberai/node-swift.git"
   }
 }
