@@ -10,7 +10,7 @@ If you're using [NodeSwift](https://github.com/kabiroberai/node-swift) to intera
 NodeConsole.log("This is a message from Swift.")
 ```
 
-This approach is useful from any Swift code that has access to `NodeConsole` by importing `NodeSwiftLogging`. So, for example, you can use `NodeConsole.log` in code you put in `#NodeModule(exports:[])`. Most of your Swift code will be blissfully ignorant of NodeSwiftLogging or the fact that is it being executed from a node server. In this case, you can use the SwiftLog backend and invoke `Logger`. 
+This approach is useful from any Swift code that has access to `NodeConsole` by importing `NodeSwiftLogging`. So, for example, you can use `NodeConsole.log` in code you put in `#NodeModule(exports:[])`. However, most of your Swift library code will be blissfully ignorant of NodeSwiftLogging or the fact that is it being executed from a node server. In this case, you can use the SwiftLog backend and invoke `Logger`. 
 
 ### Show [SwiftLog](https://github.com/apple/swift-log) messages in the node console
 
@@ -18,10 +18,10 @@ Just use the "normal" style of [SwiftLog](https://github.com/apple/swift-log) lo
 
 ```
 import Logging
-Logger(label: "NSLogger").info("This is a message from Swift.")
+Logger(label: "NodeSwiftLogger").info("This is a message from Swift.")
 ```
 
-When (from your node app) you register the callback to be used by `NodeConsole`, it will optionally bootstrap SwiftLog's `LoggingSystem` to use the `NodeConsoleLogger` backend, Your existing calls to `Logger` (or the calls to it from libraries you use) will all show up in the node.js console, with no modifications to your Swift code.
+To have `Logger` messages show up in the node console, you need to bootstrap NodeSwiftLogging's SwiftLog backend from node.js. Once you do that, your existing calls to `Logger` (or the calls to it from libraries you use) will all show up in the node.js console, with no modifications to your Swift code.
 
 ## Installation and Set Up
 
@@ -45,7 +45,7 @@ nodeConsole.registerLogCallback((message) => {
 
 ## Bootstrapping the LoggingSystem backend
 
-Optionally, you can tell the SwiftLog `LoggingSystem` to use the `NodeConsoleLogger` backend using the same NodeConsole instance you used to register the callback. You can pass the Logger.LogLevel to use, or the NodeConsoleLogger will use a default of "debug" if you don't specify it. The string you pass from node.js must resolve properly to a SwiftLog Logger.Level value or an error will be thrown:
+Optionally, you can tell the SwiftLog `LoggingSystem` to use the `NodeConsoleLogger` backend using the same NodeConsole instance you used to register the callback. You can pass the Logger.Level to use, or the NodeConsoleLogger will use a default of "debug" if you don't specify it. The string you pass from node.js must resolve properly to a SwiftLog Logger.Level value or an error will be thrown:
 
 ```
 nodeConsole.bootstrapLoggingSystem("info");
@@ -71,7 +71,7 @@ will be quick to produce a new `Module.node` that can be used from node.js and a
 
 ### Testing NodeSwiftLogging
 
-The `index.js` file shows how to access the `Module.node` you just built. `Module.node' provides access to `NodeConsole` and the two Swift endpoints that were exported in `NodeModuleExports.swift`.
+The `index.js` file shows how to access the `Module.node` you just built. `Module.node` provides access to `NodeConsole` and the two Swift endpoints that were exported in `NodeModuleExports.swift`.
 
 ```
 const { NodeConsole, testLogger, testConsole } = require('./.build/Module.node');
@@ -90,7 +90,7 @@ console.log("Bootstrapped the LoggingSystem");
 
 // Invoke the two test functions that execute and use the callback registered above and
 // the SwiftLog backend that was bootstrapped.
-testLogger();   // Swift> info: Invoked Logger(label: "NSLogger").info from Swift!
+testLogger();   // Swift> info: Invoked Logger(label: "NodeSwiftSLogger").info from Swift!
 testConsole();  // Swift> Invoked NodeConsole.log from Swift!
 ```
 
@@ -106,7 +106,7 @@ This will produce:
 $ node index.js
 Registered the NodeConsole.logCallback
 Bootstrapped the LoggingSystem
-Swift> info: Invoked Logger(label: "NSLogger").info from Swift!
+Swift> info: Invoked Logger(label: "NodeSwiftSLogger").info from Swift!
 Swift> Invoked NodeConsole.log from Swift!
 $
 ```

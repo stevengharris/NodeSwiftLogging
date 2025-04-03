@@ -17,7 +17,7 @@ import NodeSwiftLogging     // Access to NodeConsoleFacade and NodeConsole
         return
     },
     "testLogger": try NodeFunction { _ in
-        Logger(label: "NSLogger").info("Invoked Logger(label: \"NSLogger\").info from Swift!")
+        Logger(label: "NodeSwiftLogger").info("Invoked Logger(label: \"NodeSwiftSLogger\").info from Swift!")
         return
     },
 ])
