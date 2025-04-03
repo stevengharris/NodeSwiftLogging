@@ -3,17 +3,12 @@
 import PackageDescription
 
 let package = Package(
-    name: "NSLogging",
+    name: "NodeSwiftLogging",
     platforms: [.macOS(.v14)],
     products: [
         .library(
-            name: "NSLogging",
-            targets: ["NSLogging"]
-        ),
-        .library(
-            name: "Module",
-            type: .dynamic,
-            targets: ["NSLogging"]
+            name: "NodeSwiftLogging",
+            targets: ["NodeSwiftLogging"]
         )
     ],
     dependencies: [
@@ -22,11 +17,9 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "NSLogging",
+            name: "NodeSwiftLogging",
             dependencies: [
                 .product(name: "NodeAPI", package: "node-swift"),
-                .product(name: "NodeModuleSupport", package: "node-swift"),
-                .product(name: "Logging", package: "swift-log"),
             ]
         )
     ]

@@ -1,6 +1,6 @@
 //
 //  NodeConsoleLogger.swift
-//  NSLogging
+//  NodeSwiftLogging
 //
 //  Modeled on https://github.com/vapor/console-kit/blob/main/Sources/ConsoleKitTerminal/Utilities/ConsoleLogger.swift
 //

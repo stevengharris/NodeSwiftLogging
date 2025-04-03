@@ -1,14 +1,14 @@
 //
 //  NodeModuleExports.swift
-//  NSLogging
+//  NodeSwiftLogging
 //
 //  Created by Steven Harris on 2025/03/26.
 //  Copyright © 2025 Steven Harris. All rights reserved.
 //
 
 import NodeAPI
-import Logging      // Access to Logger
-import NSLogging    // Access to NodeConsoleFacade and NodeConsole
+import Logging              // Access to Logger
+import NodeSwiftLogging     // Access to NodeConsoleFacade and NodeConsole
 
 #NodeModule(exports: [
     "NodeConsole": NodeConsoleFacade.deferredConstructor,
