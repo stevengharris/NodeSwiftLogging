@@ -1,8 +1,8 @@
-# NSLogging
+# NodeSwiftLogging
 
-A [SwiftLog](https://github.com/apple/swift-log) backend for [NodeSwift](https://github.com/kabiroberai/node-swift).
+Log to the node.js console directly or with a [SwiftLog](https://github.com/apple/swift-log) backend when using [NodeSwift](https://github.com/kabiroberai/node-swift).
 
-If you're using [NodeSwift](https://github.com/kabiroberai/node-swift) to interact between Swift and node.js, understanding what is happening on the Swift side can be a challenge. NSLogger provides two mechanisms to display messages from the Swift side in the node.js console.
+If you're using [NodeSwift](https://github.com/kabiroberai/node-swift) to interact between Swift and node.js, understanding what is happening on the Swift side can be a challenge. NodeSwiftLogging provides two mechanisms to display messages from the Swift side in the node.js console.
 
 ### A Swift-equivalent of `console.log`
 
@@ -10,7 +10,7 @@ If you're using [NodeSwift](https://github.com/kabiroberai/node-swift) to intera
 NodeConsole.log("This is a message from Swift.")
 ```
 
-This approach is useful from any Swift code that has access to `NodeConsole`, which itself depends on NodeSwift's NodeAPI. So, for example, you can use `NodeConsole.log` in code you put in `#NodeModule(exports:[])`. However, most of your Swift code will be blissfully ignorant of NodeAPI or the fact that is it being executed from a node.js server. In this case, you can use the SwiftLog backend and invoke `Logger`. 
+This approach is useful from any Swift code that has access to `NodeConsole` by importing `NodeSwiftLogging`. So, for example, you can use `NodeConsole.log` in code you put in `#NodeModule(exports:[])`. Most of your Swift code will be blissfully ignorant of NodeSwiftLogging or the fact that is it being executed from a node.js server. In this case, you can use the SwiftLog backend and invoke `Logger`. 
 
 ### Show [SwiftLog](https://github.com/apple/swift-log) messages in the node.js console
 
@@ -27,73 +27,11 @@ When (from your node app) you register the callback to be used by `NodeConsole`,
 
 You need to have node.js and npm installed.
 
-You should already be using [node-swift](https://github.com/kabiroberai/node-swift) in a Swift package. That means you will have a project that includes both `Package.swift` and `package.json`. Add NSLogging as a dependency. 
+You should already be using [node-swift](https://github.com/kabiroberai/node-swift) in a Swift package. That means you will have a project that includes both `Package.swift` and `package.json`. In your `Package.swift`, add `swift-log` and `NodeSwiftLogging` as package dependencies along with your existing dependencies (which will include `node-swift`). You can use the project in the `Example` directory as a model, which also uses both `NodeConsole.log` and `Logger` to write to the node console.
 
 ## Example
 
-The resulting `Package.swift` will look something like the one in the Example directory:
-
-```
-// swift-tools-version:5.9
-
-import PackageDescription
-
-let package = Package(
-    name: "NSLoggingExample",
-    platforms: [.macOS(.v14)],
-    products: [
-        .library(
-            name: "NSLoggingExample",
-            targets: ["NSLoggingExample"]
-        ),
-        .library(
-            name: "Module",
-            type: .dynamic,
-            targets: ["NSLoggingExample"]
-        )
-    ],
-    dependencies: [
-        .package(url: "https://github.com/kabiroberai/node-swift.git", from: "1.3.0"),
-        .package(url: "https://github.com/apple/swift-log.git", from: "1.0.0"),
-        .package(url: "https://github.com/stevengharris/NSLogging.git", branch: "main"),
-    ],
-    targets: [
-        .target(
-            name: "NSLoggingExample",
-            dependencies: [
-                .product(name: "NodeAPI", package: "node-swift"),
-                .product(name: "NodeModuleSupport", package: "node-swift"),
-                .product(name: "Logging", package: "swift-log"),
-                "NSLogging"
-            ]
-        )
-    ]
-)
-```
-
-Your `package.json` will look something like the one in the Example directory:
-
-```
-{
-  "name": "nslogging-example",
-  "version": "1.0.0",
-  "description": "Example of using NSLogging",
-  "main": "index.js",
-  "scripts": {
-    "install": "node-swift rebuild",
-    "build": "node-swift build",
-    "builddebug": "node-swift build --debug",
-    "clean": "node-swift clean"
-  },
-  "author": "Steven G. Harris",
-  "license": "CC0-1.0",
-  "dependencies": {
-    "node-swift": "https://github.com/kabiroberai/node-swift.git"
-  }
-}
-```
-
-Install the node dependencies and build the node Module:
+The `Example` directory contains a complete NodeSwift project that uses NodeSwiftLogging. Clone the repository or copy the files in it to your local file system, move into the `Example` directory, and then install and build the Module.node that is used by node.js and the corresponding Swift library:
 
 ```
 npm install
@@ -105,13 +43,11 @@ The initial build will take a long time because of node-swift's dependency on [s
 npm run build
 ```
 
-will be quick to produce a new `Module.node` that can be used on the JavaScript side and a new package that can be consumed on the Swift side.
+will be quick to produce a new `Module.node` that can be used on the JavaScript side and a new Swift library with the Swift code from `Sources`.
 
-### Testing NSLogging
+### Testing NodeSwiftLogging
 
-NSLogging itself is a NodeSwift package. You can build it and test that it's working.
-
-Clone the NSLogging repository. After running (the long) `npm install` from the cloned repo, you can start up node.js on `index.js`:
+After `npm install` (or subsequently, `npm run build`) is complete, run node on the supplied `index.js`:
 
 ```
 node index.js
@@ -121,60 +57,8 @@ This will produce:
 
 ```
 $ node index.js
+Registered the NodeConsole.logCallback
 Swift> info: Invoked Logger(label: "NSLogger").info from Swift!
 Swift> Invoked NodeConsole.log from Swift!
 $
-```
-
-## Using NSLogging
-
-There is an example in the Example directory of the NSLogging repo, which is not part of the package.
-
-### Swift
-
-Expose NodeConsole as a #NodeModule export:
-
-```
-import NodeAPI
-import NSLogging
-
-#NodeModule(exports: [
-    "NodeConsole": NodeConsoleFacade.deferredConstructor,
-    // Your exports, but here are two examples:
-    "testNodeConsole": try NodeFunction { _ in
-        NodeConsole.log("Invoked NodeConsole.log from Swift!")
-        return
-    },
-    "testLogger": try NodeFunction { _ in
-        Logger(label: "NSLogger").info("Invoked Logger(label: \"NSLogger\").info from Swift!")
-        return
-    },
-])
-```
-
-### Node.js
-
-Use `import` to gain access to `NodeConsole` from `Module.node`, along with the other entry points you identified in Swift:
-
-```
-import { NodeConsole, testNodeConsole, testLogger } from './.build/Module.node';
-
-// Register the callback from Swift, including SwiftLog Logger.info and higher messages
-const nodeConsole = new NodeConsole();
-nodeConsole.registerLogCallback((message) => {
-    console.log("Swift> " + message);
-}, "info");
-```
-and then execute your Swift code from node.js:
-
-```
-testLogger();
-testNodeConsole();
-```
-
-which produces the following output in the node.js console:
-
-```
-Swift> info: Invoked Logger(label: "NSLogger").info from Swift!
-Swift> Invoked NodeConsole.log from Swift!
 ```
