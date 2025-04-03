@@ -19,7 +19,8 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/kabiroberai/node-swift.git", from: "1.3.0"),
         .package(url: "https://github.com/apple/swift-log.git", from: "1.0.0"),
-        .package(url: "https://github.com/stevengharris/NodeSwiftLogging.git", branch: "main"),
+        .package(path: ".."),   // <- For development convenience here, but perhaps better to use...
+        // .package(url: "https://github.com/stevengharris/NodeSwiftLogging.git", branch: "main"),
     ],
     targets: [
         .target(
