@@ -1,13 +1,18 @@
-const { NodeConsole, bootstrapLogging, testLogger, testNodeConsole } = require('./.build/Module.node');
+const { NodeConsole, testLogger, testConsole } = require('./.build/Module.node');
 
-// Register the callback from Swift, including swift-log Logger info and higher messages
 const nodeConsole = new NodeConsole();
+
+// Register the callback from Swift
 nodeConsole.registerLogCallback((message) => {
-    console.log("Swift> " + message);
-}, "info");
+    console.log("Swift> " + message);   // Make it obvious this message came from Swift
+});
 console.log("Registered the NodeConsole.logCallback");
 
+// Bootstrap the SwiftLog LoggingSystem, showing logging of .info level or higher
 nodeConsole.bootstrapLoggingSystem("info");
+console.log("Bootstrapped the LoggingSystem");
 
-testLogger();       // Swift> info: Invoked Logger(label: "NSLogger").info from Swift!
-testNodeConsole();  // Swift> Invoked NodeConsole.log from Swift!
+// Invoke the two test functions that execute and use the callback registered above and
+// the SwiftLog backend that was bootstrapped.
+testLogger();   // Swift> info: Invoked Logger(label: "NSLogger").info from Swift!
+testConsole();  // Swift> Invoked NodeConsole.log from Swift!

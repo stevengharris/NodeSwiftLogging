@@ -2,7 +2,7 @@
 //  NodeConsoleLogger.swift
 //  NodeSwiftLogging
 //
-//  Modeled on https://github.com/vapor/console-kit/blob/main/Sources/ConsoleKitTerminal/Utilities/ConsoleLogger.swift
+//  A simplified LogHandler implementation loosely based on https://github.com/vapor/console-kit/blob/main/Sources/ConsoleKitTerminal/Utilities/ConsoleLogger.swift
 //
 //  Created by Steven Harris on 3/31/25.
 //  Copyright © 2025 Steven Harris. All rights reserved.

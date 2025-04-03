@@ -12,7 +12,7 @@ import NodeSwiftLogging     // Access to NodeConsoleFacade and NodeConsole
 
 #NodeModule(exports: [
     "NodeConsole": NodeConsoleFacade.deferredConstructor,
-    "testNodeConsole": try NodeFunction { _ in
+    "testConsole": try NodeFunction { _ in
         NodeConsole.log("Invoked NodeConsole.log from Swift!")
         return
     },
