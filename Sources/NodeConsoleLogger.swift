@@ -9,16 +9,17 @@
 //
 
 import Logging
+import Foundation
 
 /// Outputs logs to a `NodeConsole`.
 public struct NodeConsoleLogger: LogHandler, Sendable {
-    public let label: String
+    
+    public var logLevel: Logging.Logger.Level
+    
+    public let config: NodeSwiftLoggingConfig
     
     /// See `LogHandler.metadata`.
     public var metadata: Logger.Metadata
-    
-    /// See `LogHandler.logLevel`.
-    public var logLevel: Logger.Level
     
     /// The console that the messages will get logged to.
     public let console: NodeConsole
@@ -26,15 +27,14 @@ public struct NodeConsoleLogger: LogHandler, Sendable {
     /// Creates a new `ConsoleLogger` instance.
     ///
     /// - Parameters:
-    ///   - label: Unique identifier for this logger.
     ///   - console: The console to log the messages to.
-    ///   - level: The minimum level of message that the logger will output. This defaults to `.debug`, the lowest level.
-    ///   - metadata: Extra metadata to log with the message. This defaults to an empty dictionary.
-    public init(label: String, console: NodeConsole, level: Logger.Level = .debug, metadata: Logger.Metadata = [:]) {
-        self.label = label
-        self.metadata = metadata
-        self.logLevel = level
+    ///   - config: The NodeConsoleLoggingConfig holding the label, level, etc. Note
+    ///                 that config can include metadata for the logger.
+    public init(console: NodeConsole, config: NodeSwiftLoggingConfig) {
         self.console = console
+        self.logLevel = config.level
+        self.config = config
+        self.metadata = (config.metadata as? Logger.Metadata) ?? [:]
     }
     
     /// See `LogHandler[metadataKey:]`.
@@ -47,7 +47,7 @@ public struct NodeConsoleLogger: LogHandler, Sendable {
     
     /// See `LogHandler.log(level:message:metadata:source:file:function:line:)`.
     ///
-    /// For the NodeConsole, we are (for now) passing only the level and message.
+    /// The config.format controls the detail of message that is logged.
     public func log(
         level: Logger.Level,
         message: Logger.Message,
@@ -57,24 +57,59 @@ public struct NodeConsoleLogger: LogHandler, Sendable {
         function: String,
         line: UInt
     ) {
-        try? console.log("\(level): \(message.description)")
+        switch config.format {
+        case .minimum:
+            // Log only the message
+            try? console.log(message.description)
+        case .medium:
+            // Log the level, any metadata, and the message
+            var string = "\(level):"
+            for (key, value) in self.metadata {
+                string += " \(key)=\"\(value)\""
+            }
+            if let metadata {
+                for (key, value) in metadata {
+                    string += " \(key)=\"\(value)\""
+                }
+            }
+            string += " \(message.description)"
+            try? console.log(string)
+        case .maximum:
+            // Log the UTC time along with everything we have access to
+            var string = ISO8601DateFormatter().string(from: Date()) + " \(level):"
+            for (key, value) in self.metadata {
+                string += " \(key)=\"\(value)\""
+            }
+            if let metadata {
+                for (key, value) in metadata {
+                    string += " \(key)=\"\(value)\""
+                }
+            }
+            string += " \(file)"
+            string += " \(function)"
+            string += " \(line)"
+            string += " [\(source)] \(message.description)"
+            try? console.log(string)
+        }
+        
     }
 }
 
 extension LoggingSystem {
+    
     /// Bootstraps a `NodeConsoleLogger` to the `LoggingSystem`, so that logger will be used in `Logger.init(label:)`.
     ///
-    ///     LoggingSystem.bootstrap(console: console)
+    ///     LoggingSystem.bootstrap(console: console, config: config)
     ///
     /// - Parameters:
     ///   - console: The console the logger will log the messages to.
-    ///   - level: The minimum level of message that the logger will output. This defaults to `.debug`.
+    ///   - config: The NodeSwiftLoggingConfig that was originally passed from node.js as JSON.
     public static func bootstrap(
         console: NodeConsole,
-        level: Logger.Level = .debug
+        config: NodeSwiftLoggingConfig
     ) {
         self.bootstrap({ (label) in
-            return NodeConsoleLogger(label: label, console: console, level: level)
+            return NodeConsoleLogger(console: console, config: config)
         })
     }
     

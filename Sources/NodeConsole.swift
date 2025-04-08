@@ -12,12 +12,6 @@ import Logging
 /// A facade for the NodeConsole class used in node.js.
 @NodeClass public final class NodeConsoleFacade {
 
-    /// Errors that might be thrown, which will be reported in the node.js console by node-swift.
-    enum NodeSwiftLoggingError: Error {
-        case console(String)
-        case level(String)
-    }
-    
     /// The queue to run the callback on (see https://github.com/kabiroberai/node-swift/issues/17)
     private let nodeQueue: NodeAsyncQueue
     
@@ -34,38 +28,14 @@ import Logging
     ///   - callback: The NodeFunction defined in node.js.
     @NodeActor
     @NodeMethod
-    public func registerLogCallback(callback: NodeFunction) throws {
-        NodeConsole.init(nodeQueue: nodeQueue, callback: callback)
+    public func registerLogCallback(callback: NodeFunction, jsonConfig: String? = nil) throws {
+        let config = try NodeSwiftLoggingConfig.from(json: jsonConfig)
+        NodeConsole.init(nodeQueue: nodeQueue, callback: callback, config: config)
     }
-
-    /// Bootstrap the NodeConsoleLogger as the backend for SwiftLog.
-    ///
-    /// The NodeConsole instance must exist when this method is called or an error is thrown.
-    /// This means you must call `registerLogCallback(callback:)` *before*
-    /// `bootstrapLoggingSystem(loggerLevel:)`.
-    ///
-    /// The loggerLevel (passed as a String from node.js) must resolve to a Logger.Level or an
-    /// error is thrown.
-    ///
-    /// - Parameters:
-    ///   - loggerLevel: A string corresponding to one of the Logger.Levels. Default if not provided is "debug",
-    ///   so all log messages will be shown.
-    @NodeActor
-    @NodeMethod
-    public func bootstrapLoggingSystem(loggerLevel: String = "debug") throws {
-        guard let console = NodeConsole.console  else {
-            throw NodeSwiftLoggingError.console("No NodeConsole. Register log callback before bootstrapping LoggingSystem.")
-        }
-        guard let level = Logger.Level(rawValue: loggerLevel) else {
-            throw NodeSwiftLoggingError.level("Invalid Logger level (\(loggerLevel)). See https://github.com/apple/swift-log.")
-        }
-        LoggingSystem.bootstrap(console: console, level: level)
-    }
-
 }
 
 /// A class that can be used to show a message in the node.js console via `NodeConsole.log`.
-public struct NodeConsole: Sendable {
+public struct NodeConsole: @unchecked Sendable {
     
     private let nodeQueue: NodeAsyncQueue
     private let callback: NodeFunction
@@ -74,7 +44,10 @@ public struct NodeConsole: Sendable {
     /// and used by the NodeConsoleLogger.
     @NodeActor
     fileprivate static var console: NodeConsole?
-    
+
+    @NodeActor
+    public static var logger: Logger?
+
     /// Log a message in the node.js console using the `console` singleton that can be called
     /// from anywhere.
     ///
@@ -90,9 +63,15 @@ public struct NodeConsole: Sendable {
     /// Initialize the NodeConsole singleton when the callback is registered from node.js.
     @NodeActor
     @discardableResult
-    fileprivate init(nodeQueue: NodeAsyncQueue, callback: NodeFunction) {
+    fileprivate init(nodeQueue: NodeAsyncQueue, callback: NodeFunction, config: NodeSwiftLoggingConfig) {
         self.nodeQueue = nodeQueue
         self.callback = callback
+        LoggingSystem.bootstrap(console: self, config: config)
+        var logger = Logger(label: config.label)
+        for (key, value) in config.metadata {
+            logger[metadataKey: key] = Logger.MetadataValue.string(value)
+        }
+        Self.logger = logger
         Self.console = self
     }
     
