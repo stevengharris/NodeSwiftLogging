@@ -2,7 +2,7 @@
 
 Log to the node.js console directly from Swift or with a [SwiftLog](https://github.com/apple/swift-log) backend when using [NodeSwift](https://github.com/kabiroberai/node-swift).
 
-If you're using [NodeSwift](https://github.com/kabiroberai/node-swift) to interact between Swift and node.js, understanding what is happening on the Swift side can be a challenge. NodeSwiftLogging provides two mechanisms to display messages from the Swift side in the node console.
+If you're using [NodeSwift](https://github.com/kabiroberai/node-swift) to interact between Swift and node.js, understanding what is happening on the Swift side can be a challenge. NodeSwiftLogging provides two mechanisms to help by displaying messages from the Swift side in the node console.
 
 ### A Swift-equivalent of `console.log`
 
@@ -21,7 +21,7 @@ import Logging
 Logger(label: "NodeSwiftLogger").info("This is a message from Swift.")
 ```
 
-To have `Logger` messages show up in the node console, you need to bootstrap NodeSwiftLogging's SwiftLog backend from node.js. Once you do that, your existing calls to `Logger` (or the calls to it from libraries you use) will all show up in the node.js console, with no modifications to your Swift code.
+To have `Logger` messages show up in the node console, you need to have access to the singleton `NodeConsole.logger` that is created when you register the callback to node.js. If you have a library that uses SwiftLog that will accept an instance of `Logger`, then you can pass `NodeConsole.logger` to it. Once you do that, existing calls to that `Logger` instance will all show up in the node.js console, with no modifications to your Swift code.
 
 ## Installation and Set Up
 
@@ -43,15 +43,30 @@ nodeConsole.registerLogCallback((message) => {
 });
 ```
 
-## Bootstrapping the LoggingSystem backend
+## Configuring the LoggingSystem backend
 
-Optionally, you can tell the SwiftLog `LoggingSystem` to use the `NodeConsoleLogger` backend using the same NodeConsole instance you used to register the callback. You can pass the Logger.Level to use, or the NodeConsoleLogger will use a default of "debug" if you don't specify it. The string you pass from node.js must resolve properly to a SwiftLog Logger.Level value or an error will be thrown:
+The `NodeConsole.registerLogCallback` method accepts an optional configuration argument that allows you to control:
+
+* The minimum log level to report
+* The label used for the instance of `Logger`
+* The amount of detail included in the message returned to the node console
+* Any metadata to associate with the `Logger` instance
+
+For example:
 
 ```
-nodeConsole.bootstrapLoggingSystem("info");
+const nodeConsole = new NodeConsole();
+const loggingConfig = {
+    level: "info",                   // <- Minimum log level, "debug" by default
+    format: "minimum",               // <- "medium" by default includes log level and metatadat
+    metadata: {myKey : "myValue"}    // <- Pass a key and string value to accompany every log message
+}
+nodeConsole.registerLogCallback((message) => {
+    console.log("Swift> " + message);   // Make it obvious this message came from Swift
+}, JSON.stringify(loggingConfig));
 ```
 
-If you don't bootstrap the `LoggingSystem` to set up the `NodeConsoleLogger` backend, then Swift calls to `Logger` will use whatever backend it is already using or its default, `StreamLogHandler.standardError`. The messages to `stderr` generally won't show up in the node console (although if you're running node.js from the command line you will still see them).
+Refer to the details in `NodeConsoleLogger.log(level:message:metadata:source:file:function:line:)'.
 
 ## Example
 
@@ -83,10 +98,6 @@ nodeConsole.registerLogCallback((message) => {
     console.log("Swift> " + message);   // Make it obvious this message came from Swift
 });
 console.log("Registered the NodeConsole.logCallback");
-
-// Bootstrap the SwiftLog LoggingSystem, showing logging of .info level or higher
-nodeConsole.bootstrapLoggingSystem("info");
-console.log("Bootstrapped the LoggingSystem");
 
 // Invoke the two test functions that execute and use the callback registered above and
 // the SwiftLog backend that was bootstrapped.
