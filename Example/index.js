@@ -1,16 +1,21 @@
 const { NodeConsole, testLogger, testConsole } = require('./.build/Module.node');
 
+// Get an instance of the NodeConsole class, a facade exposed in Module.node
 const nodeConsole = new NodeConsole();
+
+// Optionally, set and pass a logging configuration to be used.
+// By default, it is {level: "debug", format: "medium"} without metadata.
+// const loggingConfig = {
+//     level: "info",                   // <- Set a minimum log level
+//     format: "minimum",               // <- "medium by default"
+//     metadata: {myKey : "myValue"}    // <- Pass a key and string value to accompany every log message
+// }
 
 // Register the callback from Swift
 nodeConsole.registerLogCallback((message) => {
     console.log("Swift> " + message);   // Make it obvious this message came from Swift
-});
+});     // Optionally, pass the stringified loggingConfig... JSON.stringify(loggingConfig));
 console.log("Registered the NodeConsole.logCallback");
-
-// Bootstrap the SwiftLog LoggingSystem, showing logging of .info level or higher
-nodeConsole.bootstrapLoggingSystem("info");
-console.log("Bootstrapped the LoggingSystem");
 
 // Invoke the two test functions that execute and use the callback registered above and
 // the SwiftLog backend that was bootstrapped.
