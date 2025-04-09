@@ -66,7 +66,7 @@ nodeConsole.registerLogCallback((message) => {
 }, JSON.stringify(loggingConfig));
 ```
 
-Refer to the details in `NodeConsoleLogger.log(level:message:metadata:source:file:function:line:)'.
+Refer to the details in `NodeConsoleLogger.log(level:message:metadata:source:file:function:line:)`.
 
 ## Example
 
