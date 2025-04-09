@@ -14,14 +14,13 @@ This approach is useful from any Swift code that has access to `NodeConsole` by 
 
 ### Show [SwiftLog](https://github.com/apple/swift-log) messages in the node console
 
-Just use the "normal" style of [SwiftLog](https://github.com/apple/swift-log) logging in your Swift code, with whatever `label` makes sense in the context of your Swift app:
+Just use the "normal" style of [SwiftLog](https://github.com/apple/swift-log) logging in your Swift code, using the `NodeConsole.logger` instance:
 
 ```
-import Logging
-Logger(label: "NodeSwiftLogger").info("This is a message from Swift.")
+NodeConsole.logger.info("This is a message from Swift.")
 ```
 
-To have `Logger` messages show up in the node console, you need to have access to the singleton `NodeConsole.logger` that is created when you register the callback to node.js. If you have a library that uses SwiftLog that will accept an instance of `Logger`, then you can pass `NodeConsole.logger` to it. Once you do that, existing calls to that `Logger` instance will all show up in the node.js console, with no modifications to your Swift code.
+To have `Logger` messages show up in the node console, you need to have access to the singleton `NodeConsole.logger` that is created when you register the callback to node.js. If you have a library that uses SwiftLog. and that library provides an API to set the `Logger` instance, then you can pass `NodeConsole.logger` to it. Once you do that, existing calls to that `Logger` instance will all show up in the node.js console, with no modifications to your Swift code.
 
 ## Installation and Set Up
 
@@ -101,7 +100,7 @@ console.log("Registered the NodeConsole.logCallback");
 
 // Invoke the two test functions that execute and use the callback registered above and
 // the SwiftLog backend that was bootstrapped.
-testLogger();   // Swift> info: Invoked Logger(label: "NodeSwiftLogger").info from Swift!
+testLogger();   // Swift> info: Invoked NodeConsole.logger.info from Swift!
 testConsole();  // Swift> Invoked NodeConsole.log from Swift!
 ```
 
@@ -116,8 +115,7 @@ This will produce:
 ```
 $ node index.js
 Registered the NodeConsole.logCallback
-Bootstrapped the LoggingSystem
-Swift> info: Invoked Logger(label: "NodeSwiftLogger").info from Swift!
+Swift> info: Invoked NodeConsole.logger.info from Swift!
 Swift> Invoked NodeConsole.log from Swift!
 $
 ```

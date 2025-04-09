@@ -19,5 +19,5 @@ console.log("Registered the NodeConsole.logCallback");
 
 // Invoke the two test functions that execute and use the callback registered above and
 // the SwiftLog backend that was bootstrapped.
-testLogger();   // Swift> info: Invoked Logger(label: "NodeSwiftLogger").info from Swift!
+testLogger();   // Swift> info: Invoked NodeConsole.logger.info from Swift!
 testConsole();  // Swift> Invoked NodeConsole.log from Swift!
