@@ -17,11 +17,7 @@ import NodeSwiftLogging     // Access to NodeConsoleFacade and NodeConsole
         return
     },
     "testLogger": try NodeFunction { _ in
-        if let logger = NodeConsole.logger {
-            logger.info("Invoked Logger(label: \"NodeSwiftLogger\").info from Swift!")
-        } else {
-            NodeConsole.log("NodeConsole.logger is nil.")
-        }
+        NodeConsole.logger.info("Invoked NodeConsole.logger.info from Swift!")
         return
     },
 ])

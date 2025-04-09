@@ -37,16 +37,30 @@ import Logging
 /// A class that can be used to show a message in the node.js console via `NodeConsole.log`.
 public struct NodeConsole: @unchecked Sendable {
     
+    /// The NodeAsyncQueue we run the `callback` on.
     private let nodeQueue: NodeAsyncQueue
+    
+    /// The NodeFunction that was passed from node.js when calling  `registerLogCallback`.
     private let callback: NodeFunction
     
     /// The singleton `NodeConsole`, which will be the same instance created in NodeConsoleFacade
     /// and used by the NodeConsoleLogger.
     @NodeActor
-    fileprivate static var console: NodeConsole?
+    private static var console: NodeConsole?
 
+    /// Return the `privateLogger` instance, which will exist if `console` was successfully instantiated.
+    /// This logger will use the NodeConsoleLogger backend.
+    ///
+    /// If `console` and `privateLogger` were never instantiated, then return a default Logger instance
+    /// which presumably used SwiftLog's default.
     @NodeActor
-    public static var logger: Logger?
+    public static var logger: Logger {
+        get { privateLogger ?? Logger(label: "DefaultLogger") }
+        set { privateLogger = newValue }
+    }
+    
+    @NodeActor
+    private static var privateLogger: Logger?
 
     /// Log a message in the node.js console using the `console` singleton that can be called
     /// from anywhere.
@@ -71,7 +85,7 @@ public struct NodeConsole: @unchecked Sendable {
         for (key, value) in config.metadata {
             logger[metadataKey: key] = Logger.MetadataValue.string(value)
         }
-        Self.logger = logger
+        Self.privateLogger = logger
         Self.console = self
     }
     
