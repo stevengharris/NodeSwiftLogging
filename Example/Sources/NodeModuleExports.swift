@@ -7,17 +7,19 @@
 //
 
 import NodeAPI
-import Logging              // Access to Logger
-import NodeSwiftLogging     // Access to NodeConsoleFacade and NodeConsole
+import NodeSwiftLogging     // Access to NodeConsole and NodeLogger
 
 #NodeModule(exports: [
-    "NodeConsole": NodeConsoleFacade.deferredConstructor,
+    "NodeConsole": NodeConsole.deferredConstructor,
+    "NodeLogger" : NodeLogger.deferredConstructor,
     "testConsole": try NodeFunction { _ in
         NodeConsole.log("Invoked NodeConsole.log from Swift!")
         return
     },
     "testLogger": try NodeFunction { _ in
-        NodeConsole.logger.info("Invoked NodeConsole.logger.info from Swift!")
+        // NodeLogger.backend provides access to the NodeSwiftLogger backend
+        let logger = NodeLogger.backend;
+        logger.info("Invoked logger.info from Swift!")
         return
     },
 ])

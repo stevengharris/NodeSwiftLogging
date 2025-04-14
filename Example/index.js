@@ -1,23 +1,30 @@
-const { NodeConsole, testLogger, testConsole } = require('./.build/Module.node');
+const { NodeConsole, testConsole, NodeLogger, testLogger } = require('./.build/Module.node');
 
-// Get an instance of the NodeConsole class, a facade exposed in Module.node
-const nodeConsole = new NodeConsole();
+// Instantiate the NodeConsole, passing the callback
+new NodeConsole((message) => {
+    console.log(message);
+});
 
 // Optionally, set and pass a logging configuration to be used.
-// By default, it is {level: "debug", format: "medium"} without metadata.
 // const loggingConfig = {
-//     level: "info",                   // <- Set a minimum log level
-//     format: "minimum",               // <- "medium by default"
-//     metadata: {myKey : "myValue"}    // <- Pass a key and string value to accompany every log message
+//     level: "info",                   // <- "debug" by default
+//     label: "MyLabel",                // <- "NodeSwiftLogger" by default
+//     metadata: {myKey : "myValue"}    // <- Applied to every log message, null by default
 // }
 
-// Register the callback from Swift
-nodeConsole.registerLogCallback((message) => {
-    console.log("Swift> " + message);   // Make it obvious this message came from Swift
-});     // Optionally, pass the stringified loggingConfig... JSON.stringify(loggingConfig));
-console.log("Registered the NodeConsole.logCallback");
+// Instantiate the NodeLogger, passing the callback
+new NodeLogger(nsLogHandler)            // <- Pass `JSON.stringify(loggingConfig)` after callback
 
-// Invoke the two test functions that execute and use the callback registered above and
-// the SwiftLog backend that was bootstrapped.
-testLogger();   // Swift> info: Invoked NodeConsole.logger.info from Swift!
-testConsole();  // Swift> Invoked NodeConsole.log from Swift!
+// A callback function to parse the LogSwift json and log it to the console
+function nsLogHandler(json) {
+    const data = JSON.parse(json);
+    const metadata = (data.metadata) ? JSON.stringify(data.metadata) + ' ' : '';
+    const date = new Date();
+    // CA, because the only sane way to show a timestamp is yyyy-mm-dd, not US style mm/dd/yyyy
+    const timestamp = date.toLocaleDateString('en-CA') + ' ' + date.toLocaleTimeString('en-CA', { hour12: false });
+    console.log(timestamp + ' [' + data.level.toUpperCase() + '] ' + metadata + data.message);
+};
+
+// Invoke the two test functions that execute and cause the callbacks to be invoked from Swift
+testConsole();  // Invoked NodeConsole.log from Swift!
+testLogger();   // <Local en-CA timestamp> [INFO] Invoked logger.info from Swift!
