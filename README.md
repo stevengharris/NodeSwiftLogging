@@ -10,7 +10,7 @@
 
 Log to the node.js console directly from Swift or log with a [SwiftLog](https://github.com/apple/swift-log) backend when using [NodeSwift](https://github.com/kabiroberai/node-swift).
 
-If you're using [NodeSwift](https://github.com/kabiroberai/node-swift) to interact between Swift and node.js, it's helpful to have an easy way get information from Swift into the node console or to capture logging data from Swift in a node.js log. NodeSwiftLogging provides both of these mechanisms.
+If you're using [NodeSwift](https://github.com/kabiroberai/node-swift) to interact between Swift and node.js, it's helpful to have an easy way to get information from Swift into the node console or to capture logging data from Swift in a node.js log. NodeSwiftLogging provides both of these mechanisms.
 
 ### A Swift-equivalent of `console.log`
 
