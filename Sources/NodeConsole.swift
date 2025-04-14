@@ -9,100 +9,54 @@
 import NodeAPI
 import Logging
 
-/// A facade for the NodeConsole class used in node.js.
-@NodeClass public final class NodeConsoleFacade {
+@NodeClass public final class NodeConsole {
+
+    /// The singleton `NodeConsole`
+    private static var console: NodeConsole?
 
     /// The queue to run the callback on (see https://github.com/kabiroberai/node-swift/issues/17)
     private let nodeQueue: NodeAsyncQueue
-    
-    /// Initialize the `nodeQueue` callback queue when the instance is created on the node.js side.
-    @NodeActor
-    @NodeConstructor
-    public init() throws {
-        nodeQueue = try NodeAsyncQueue(label: "nodeConsoleQueue")
-    }
-    
-    /// Initialize the NodeConsole singleton that will execute `callback` on `nodeQueue`.
-    ///
-    /// - Parameters:
-    ///   - callback: The NodeFunction defined in node.js.
-    @NodeActor
-    @NodeMethod
-    public func registerLogCallback(callback: NodeFunction, jsonConfig: String? = nil) throws {
-        let config = try NodeSwiftLoggingConfig.from(json: jsonConfig)
-        NodeConsole.init(nodeQueue: nodeQueue, callback: callback, config: config)
-    }
-}
 
-/// A class that can be used to show a message in the node.js console via `NodeConsole.log`.
-public struct NodeConsole: @unchecked Sendable {
-    
-    /// The NodeAsyncQueue we run the `callback` on.
-    private let nodeQueue: NodeAsyncQueue
-    
-    /// The NodeFunction that was passed from node.js when calling  `registerLogCallback`.
+    /// The NodeFunction that was passed from node.js when instantiating the NodeConsole.
     private let callback: NodeFunction
     
-    /// The singleton `NodeConsole`, which will be the same instance created in NodeConsoleFacade
-    /// and used by the NodeConsoleLogger.
-    @NodeActor
-    private static var console: NodeConsole?
-
-    /// Return the `privateLogger` instance, which will exist if `console` was successfully instantiated.
-    /// This logger will use the NodeConsoleLogger backend.
+    /// Log a message in the node.js console using the `console` singleton.
     ///
-    /// If `console` and `privateLogger` were never instantiated, then return a default Logger instance
-    /// which presumably used SwiftLog's default.
-    @NodeActor
-    public static var logger: Logger {
-        get { privateLogger ?? Logger(label: "DefaultLogger") }
-        set { privateLogger = newValue }
-    }
-    
-    @NodeActor
-    private static var privateLogger: Logger?
-
-    /// Log a message in the node.js console using the `console` singleton that can be called
-    /// from anywhere.
+    /// Note this is the only public method of NodeConsole other than `init`.
     ///
-    /// The `console.log` will be run async on @NodeActor. Thus, `NodeConsole.log`
-    /// messages may arrive in the node console after messages logged by the `NodeConsoleLogger`
-    /// SwiftLog backend.
+    /// This method can can be called from anywhere because `console.log` will be run
+    /// async on @NodeActor.
     public static func log(_ message: String) {
         Task { @NodeActor in
             try? console?.log(message)
         }
     }
     
-    /// Initialize the NodeConsole singleton when the callback is registered from node.js.
+    /// Create an instance of NodeConsole, keeping that instance in a static singleton `console`
+    /// that can be used via `NodeConsole.log` which in turn executes the `callback`.
+    ///
+    /// We also initialize the `nodeQueue` callback queue to use for async calls back into node.js
+    /// from anywhere.
+    ///
+    /// In node.js, you would have done something like this (where `NodeConsole` is imported from
+    /// `Module.node`):
+    ///
+    ///     NodeConsole((message) => {
+    ///         console.log(message);
+    ///     });
     @NodeActor
-    @discardableResult
-    fileprivate init(nodeQueue: NodeAsyncQueue, callback: NodeFunction, config: NodeSwiftLoggingConfig) {
-        self.nodeQueue = nodeQueue
+    @NodeConstructor
+    public init(callback: NodeFunction) throws {
+        nodeQueue = try NodeAsyncQueue(label: "nodeConsoleQueue")
         self.callback = callback
-        LoggingSystem.bootstrap(console: self, config: config)
-        var logger = Logger(label: config.label)
-        for (key, value) in config.metadata {
-            logger[metadataKey: key] = Logger.MetadataValue.string(value)
-        }
-        Self.privateLogger = logger
         Self.console = self
     }
     
     /// Run the `callback` on the `nodeQueue`, passing the `message`.
-    ///
-    /// Note that the NodeConsoleLogger uses this instance method directly, since it holds onto the NodeConsole.
-    ///
-    /// The callback function defined in node.js when registering the callback will be called with the argument `message`.
-    /// For example, in node.js, you would have done something like (where `NodeConsole` is imported from `Module.node`):
-    ///
-    ///     const nodeConsole = new NodeConsole();
-    ///     nodeConsole.registerLogCallback((message) => {
-    ///         console.log("Swift> " + message);
-    ///     });
-    public func log(_ message: String) throws {
+    private func log(_ message: String) throws {
         try nodeQueue.run {
             try callback.call([message])
         }
     }
+
 }
