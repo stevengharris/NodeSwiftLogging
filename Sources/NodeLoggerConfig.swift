@@ -3,7 +3,6 @@
 //  NodeSwiftLogging
 //
 //  Created by Steven Harris on 4/8/25.
-//  Copyright © 2025 Steven Harris. All rights reserved.
 //
 
 import Logging
