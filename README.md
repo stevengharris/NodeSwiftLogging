@@ -1,3 +1,11 @@
+<p align="center">
+    <img src="https://img.shields.io/badge/Swift-5.9+-blue.svg">
+    <img src="https://img.shields.io/badge/Mac-14+-blue">
+    <a href="https://mastodon.social/@stevengharris">
+        <img src="https://img.shields.io/badge/Contact-@stevengharris-lightgrey.svg?style=flat" alt="Mastodon: @stevengharris@mastodon.social">
+    </a>
+</p>
+
 # NodeSwiftLogging
 
 Log to the node.js console directly from Swift or log with a [SwiftLog](https://github.com/apple/swift-log) backend when using [NodeSwift](https://github.com/kabiroberai/node-swift).
