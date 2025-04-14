@@ -48,6 +48,9 @@ Once you instantiate it from node.js, you can use the `NodeConsole.log(_ message
 
 Instead of a string message, the callback for the `NodeLogger` is passed JSON that can be parsed to extract the data provided by SwiftLog. You can use that data to do whatever you want; for example, you might just log it to the console, or you could hook it into a node.js logging library like [Pino](https://github.com/pinojs/pino) or [Winston](https://github.com/winstonjs/winston). The [log data](https://apple.github.io/swift-log/docs/current/Logging/Protocols/LogHandler.html) from SwiftLog consists of:
 
+
+| Parameter | Description |
+| --- | --- |
 | level       | The log level the message was logged at.                                           |
 | message     | The message to log.                                                                |
 | metadata    | Optional [String : String] dictionary of metadata from logger and the log message. |
