@@ -21,7 +21,7 @@ let logger = NodeLogger.backend
 logger.info("This is a message from Swift.")
 ```
 
-To have `Logger` data show up in the node.js, you need to have access to the singleton `NodeLogger.backend` that is created when you instantiate the `NodeLogger` in node.js. If you have a library that uses SwiftLog, and that library provides an API to set the `Logger` instance, then you can pass `NodeLogger.backend` to it. Once you do that, existing calls to that `Logger` instance will all show up in node.js, with no modifications to your Swift code.
+To have `Logger` data show up in node.js, you need to have access to the singleton `NodeLogger.backend` that is created when you instantiate the `NodeLogger` in node.js. If you have a library that uses SwiftLog, and that library provides an API to set the `Logger` instance, then you can pass `NodeLogger.backend` to it. Once you do that, existing calls to that `Logger` instance will all show up in node.js, with no modifications to your Swift code.
 
 ## Installation and Set Up
 
@@ -48,13 +48,13 @@ Once you instantiate it from node.js, you can use the `NodeConsole.log(_ message
 
 Instead of a string message, the callback for the `NodeLogger` is passed JSON that can be parsed to extract the data provided by SwiftLog. You can use that data to do whatever you want; for example, you might just log it to the console, or you could hook it into a node.js logging library like [Pino](https://github.com/pinojs/pino) or [Winston](https://github.com/winstonjs/winston). The [log data](https://apple.github.io/swift-log/docs/current/Logging/Protocols/LogHandler.html) from SwiftLog consists of:
 
-    | `level`       | The log level the message was logged at.                                          |
-    | `message`     | The message to log.                                                               |
-    | `metadata`    | Optional [String : String] dictionary of metadata from logger and the log message.|
-    | `source`      | The source where the log message originated, for example the logging module.      |
-    | `file`        | The file the log message was emitted from.                                        |
-    | `function`    | The function the log line was emitted from.                                       |
-    | `line`        | The line the log message was emitted from.                                        |
+| level       | The log level the message was logged at.                                           |
+| message     | The message to log.                                                                |
+| metadata    | Optional [String : String] dictionary of metadata from logger and the log message. |
+| source      | The source where the log message originated, for example the logging module.       |
+| file        | The file the log message was emitted from.                                         |
+| function    | The function the log line was emitted from.                                        |
+| line        | The line the log message was emitted from.                                         |
 
 A minimally useful callback for the `NodeLogger` would mirror the one for `NodeConsole`, but has to extract the `message` from the JSON. For example:
 
